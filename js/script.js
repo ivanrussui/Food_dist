@@ -139,54 +139,82 @@ window.addEventListener('DOMContentLoaded', () => {
     modal = document.querySelector('.modal'),
     modalCloseBtn = document.querySelector('[data-close]');
 
-  modalTrigger.forEach(btn => {
-    btn.addEventListener('click', () => {
-      modal.classList.add('show');
-      modal.classList.remove('hide');
-			// стиль блокирующий прокрутку при откр модальн окна
-			document.body.style.overflow = ' hidden';
-    });
+  // modalTrigger.forEach(btn => {
+  //   btn.addEventListener('click', () => {
+  //     modal.classList.add('show');
+  //     modal.classList.remove('hide');
+  // 		// стиль блокирующий прокрутку при откр модальн окна
+  // 		document.body.style.overflow = 'hidden';
+  //   });
+  // });
+
+  // пишу modalTrigger в функцию чтобы код не повторялся и переиспольз функцию
+  function openModal() {
+    modal.classList.add('show');
+    modal.classList.remove('hide');
+    // стиль блокирующий прокрутку при откр модальн окна
+    document.body.style.overflow = 'hidden';
+		// если пользователь открыл сам модалку то clearInterval чтобы не появлялась модалка
+		clearInterval(modalTimerId);
+  }
+
+  modalTrigger.forEach((btn) => {
+    btn.addEventListener('click', openModal);
   });
 
-
-	// пишу modalCloseBtn в функцию чтобы код не повторялся и переиспольз функцию ниже
-	function	closeModal() {
-		modal.classList.add('hide');
+  // пишу modalCloseBtn в функцию чтобы код не повторялся и переиспольз функцию ниже
+  function closeModal() {
+    modal.classList.add('hide');
     modal.classList.remove('show');
-		// стиль вкл прокрутку при закр мод окна '' означ по умолч браузер сам подставит
-		document.body.style.overflow = '';
-	}
+    // стиль вкл прокрутку при закр мод окна '' означ по умолч браузер сам подставит
+    document.body.style.overflow = '';
+  }
 
-	modalCloseBtn.addEventListener('click', closeModal);
+  modalCloseBtn.addEventListener('click', closeModal);
 
-
-	// альтернатива методов modalTrigger и modalCloseBtn выше с тоггл
+  // альтернатива методов modalTrigger и modalCloseBtn выше с тоггл
   // modalTrigger.forEach((modalTrigger) => {
   //   modalTrigger.addEventListener('click', () => {
-	// 		modal.classList.toggle('show');
-	// 		// стиль блокирующий прокрутку при откр модальн окна
-	// 		document.body.style.overflow = ' hidden';
+  // 		modal.classList.toggle('show');
+  // 		// стиль блокирующий прокрутку при откр модальн окна
+  // 		document.body.style.overflow = ' hidden';
   //   });
   // });
 
   // modalCloseBtn.addEventListener('click', () => {
-	// 	modal.classList.toggle('show');
-	// 	// стиль вкл прокрутку при закр мод окна '' означ по умолч браузер сам подставит
-	// 	document.body.style.overflow = '';
+  // 	modal.classList.toggle('show');
+  // 	// стиль вкл прокрутку при закр мод окна '' означ по умолч браузер сам подставит
+  // 	document.body.style.overflow = '';
   // });
 
-	// закрытие модалки при клике за пределы модалки
-	modal.addEventListener('click', (e) => {
-		if (e.target === modal) {
-			closeModal();
-		}
-	});
+  // закрытие модалки при клике за пределы модалки
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
 
-	// закрытие модалки при нажатии Esc
-	document.addEventListener('keydown', (e) => {
-		// eventcode у Esc - Escape && чтобы функ closeModal() вызывалась только когда модальн окно открыто
-		if (e.code === 'Escape' && modal.classList.contains('show')) {
-			closeModal();
+  // закрытие модалки при нажатии Esc
+  document.addEventListener('keydown', (e) => {
+    // eventcode у Esc - Escape && чтобы функ closeModal() вызывалась только когда модальн окно открыто
+    if (e.code === 'Escape' && modal.classList.contains('show')) {
+      closeModal();
+    }
+  });
+
+  // модалка появляется спустя время на сайте
+	const modalTimerId = setTimeout(openModal, 5000);
+
+	// функция появления модалки
+	function showModalByScroll() {
+		// если прокрученная часть + видимая часть на сайте без прокрутки >= полный сайт (полная прокрутка)
+		if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+			openModal();
+			// удаляем обработчик события чтобы работал только 1 раз
+			window.removeEventListener('scroll', showModalByScroll);
 		}
-	});
+	}
+
+	// модалка появляется когда юзер проскроллил сайт
+	window.addEventListener('scroll', showModalByScroll);
 });
