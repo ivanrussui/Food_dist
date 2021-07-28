@@ -154,8 +154,8 @@ window.addEventListener('DOMContentLoaded', () => {
     modal.classList.remove('hide');
     // стиль блокирующий прокрутку при откр модальн окна
     document.body.style.overflow = 'hidden';
-		// если пользователь открыл сам модалку то clearInterval чтобы не появлялась модалка
-		clearInterval(modalTimerId);
+    // если пользователь открыл сам модалку то clearInterval чтобы не появлялась модалка
+    clearInterval(modalTimerId);
   }
 
   modalTrigger.forEach((btn) => {
@@ -203,18 +203,115 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   // модалка появляется спустя время на сайте
-	const modalTimerId = setTimeout(openModal, 5000);
+  const modalTimerId = setTimeout(openModal, 5000);
 
-	// функция появления модалки
-	function showModalByScroll() {
-		// если прокрученная часть + видимая часть на сайте без прокрутки >= полный сайт (полная прокрутка)
-		if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
-			openModal();
-			// удаляем обработчик события чтобы работал только 1 раз
-			window.removeEventListener('scroll', showModalByScroll);
+  // функция появления модалки
+  function showModalByScroll() {
+    // если прокрученная часть + видимая часть на сайте без прокрутки >= полный сайт (полная прокрутка)
+    if (
+      window.pageYOffset + document.documentElement.clientHeight >=
+      document.documentElement.scrollHeight
+    ) {
+      openModal();
+      // удаляем обработчик события чтобы работал только 1 раз
+      window.removeEventListener('scroll', showModalByScroll);
+    }
+  }
+
+  // модалка появляется когда юзер проскроллил сайт
+  window.addEventListener('scroll', showModalByScroll);
+
+	
+  // Использую классы для карточек
+
+	// получаю карточки
+  class MenuCard {
+		// путь к картинке, альт текст, заголовок, описание, цена, родитель куда помещаются карточки
+    constructor(src, alt, title, descr, price, parentSelector) {
+      this.src = src;
+      this.alt = alt;
+      this.title = title;
+      this.descr = descr;
+      this.price = price;
+			//  в this.parent кладем ДОМ элемент
+			this.parent = document.querySelector(parentSelector); // можно так же в render() делать
+			// для курса валют
+			this.transfer = 27;
+			// вызываем метод конвертации валюты
+			this.changeToUAH(); // его можно было так же и в методе render() вызывать
+    }
+
+		// метод конвертации валют
+		changeToUAH() {
+			// умножаем цену на курс
+			this.price = this.price * this.transfer;
+			// можно написать +this.price чтобы строка преобразовывалась в число
+			// this.price = +this.price * this.transfer;
 		}
-	}
 
-	// модалка появляется когда юзер проскроллил сайт
-	window.addEventListener('scroll', showModalByScroll);
+    render() {
+			// метод конвертации валют changeToUAH() можно и тут вызвать. или в конструкторе
+
+			// тут пишем верстку
+			// создаем див
+			const element = document.createElement('div');
+      element.innerHTML = `
+				<div class="menu__item">
+					<img src=${this.src} alt=${this.alt}>
+					<h3 class="menu__item-subtitle">${this.title}</h3>
+					<div class="menu__item-descr">${this.descr}</div>
+					<div class="menu__item-divider"></div>
+					<div class="menu__item-price">
+						<div class="menu__item-cost">Цена:</div>
+						<!-- заметь в ${this.price} падает цена конвертированная с помощью метода this.changeToUAH(); -->
+						<div class="menu__item-total"><span>${this.price}</span> грн/день</div>
+					</div>
+				</div>
+			`;
+			// наш новый созданный ДОМ элемент помещаем в element
+			this.parent.append(element);
+    }
+  }
+
+	// надо создать новый объект и вызвать метод render()
+
+	// можно импользовать такой синтаксис
+	// const div = new MenuCard(сюда аргументы);
+	// div.render();
+
+	// но есть метод сокращенней
+	// используем объект без помещения в переменную
+	// так можно делать если используешь на месте. потом доступа к этому объекту не будет
+	new MenuCard(
+		// вставляем аргументы src, alt, title и т.д.
+		// вставляем с кавычками 
+		"img/tabs/vegy.jpg",
+		"vegy",
+		// то что имеет свои ковычки то в одинарные 
+		'Меню "Фитнес"',
+		'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+		// это число как я понял условное просто 9 долларов типо из базы данных ему приходит
+		9,
+		// родительский селектор parentSelector; в верстке есть класс меню а в нем класс контейнер
+		'.menu .container'
+	).render();
+
+	// пишем еще 2 карточки
+	new MenuCard(
+		"img/tabs/elite.jpg",
+		"elite",
+		'Меню "Премиум"',
+		'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
+		14,
+		'.menu .container'
+	).render();
+
+	new MenuCard(
+		"img/tabs/post.jpg",
+		"post",
+		'Меню "Постное"',
+		'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
+		21,
+		'.menu .container'
+	).render();
 });
