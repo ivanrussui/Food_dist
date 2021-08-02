@@ -227,12 +227,15 @@ window.addEventListener('DOMContentLoaded', () => {
 	// получаю карточки
   class MenuCard {
 		// путь к картинке, альт текст, заголовок, описание, цена, родитель куда помещаются карточки
-    constructor(src, alt, title, descr, price, parentSelector) {
+		// ...classes это rest оператор
+    constructor(src, alt, title, descr, price, parentSelector, ...classes) {
       this.src = src;
       this.alt = alt;
       this.title = title;
       this.descr = descr;
       this.price = price;
+			// передаем рекст оператор, он передается как массив
+			this.classes = classes;
 			//  в this.parent кладем ДОМ элемент
 			this.parent = document.querySelector(parentSelector); // можно так же в render() делать
 			// для курса валют
@@ -251,21 +254,35 @@ window.addEventListener('DOMContentLoaded', () => {
 
     render() {
 			// метод конвертации валют changeToUAH() можно и тут вызвать. или в конструкторе
-
+			
 			// тут пишем верстку
 			// создаем див
 			const element = document.createElement('div');
+			
+			// назначаем классы this.classes который через rest оператор записан 
+
+			// если в ...classes ничего не передается, то присваиваем класс menu__item
+			if (this.classes.length === 0) {
+				// element.classList.add('menu__item'); // так можно но есть круче способ ниже
+
+				// записываем класс menu__item в свойства this.element
+				this.element = 'menu__item';
+				element.classList.add(this.element);
+			} else {
+				// className называем каждый элемент внутри массива. className это аргумент => функции
+				this.classes.forEach(className => element.classList.add(className)); // element это переменная которая выше создана
+			}
+
       element.innerHTML = `
-				<div class="menu__item">
-					<img src=${this.src} alt=${this.alt}>
-					<h3 class="menu__item-subtitle">${this.title}</h3>
-					<div class="menu__item-descr">${this.descr}</div>
-					<div class="menu__item-divider"></div>
-					<div class="menu__item-price">
-						<div class="menu__item-cost">Цена:</div>
-						<!-- заметь в ${this.price} падает цена конвертированная с помощью метода this.changeToUAH(); -->
-						<div class="menu__item-total"><span>${this.price}</span> грн/день</div>
-					</div>
+			<!-- убираем обвертку div class="menu__item", она будет ниже в new MenuCard()-->
+				<img src=${this.src} alt=${this.alt}>
+				<h3 class="menu__item-subtitle">${this.title}</h3>
+				<div class="menu__item-descr">${this.descr}</div>
+				<div class="menu__item-divider"></div>
+				<div class="menu__item-price">
+					<div class="menu__item-cost">Цена:</div>
+					<!-- заметь в ${this.price} падает цена конвертированная с помощью метода this.changeToUAH(); -->
+					<div class="menu__item-total"><span>${this.price}</span> грн/день</div>
 				</div>
 			`;
 			// наш новый созданный ДОМ элемент помещаем в element
@@ -293,7 +310,9 @@ window.addEventListener('DOMContentLoaded', () => {
 		// это число как я понял условное просто 9 долларов типо из базы данных ему приходит
 		9,
 		// родительский селектор parentSelector; в верстке есть класс меню а в нем класс контейнер
-		'.menu .container'
+		'.menu .container',
+		// добавляем класс обвертку menu__item (без .) из метода render()
+		'menu__item'
 	).render();
 
 	// пишем еще 2 карточки
@@ -303,7 +322,9 @@ window.addEventListener('DOMContentLoaded', () => {
 		'Меню "Премиум"',
 		'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
 		14,
-		'.menu .container'
+		'.menu .container',
+		// добавляем класс обвертку menu__item (без .) из метода render()
+		'menu__item'
 	).render();
 
 	new MenuCard(
@@ -312,6 +333,8 @@ window.addEventListener('DOMContentLoaded', () => {
 		'Меню "Постное"',
 		'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
 		21,
-		'.menu .container'
+		'.menu .container',
+		// тут специально нет menu__item
+		// мы его добавили через условие if (this.classes.length === 0) в методе render()
 	).render();
 });
