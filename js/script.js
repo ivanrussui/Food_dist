@@ -221,57 +221,56 @@ window.addEventListener('DOMContentLoaded', () => {
   // модалка появляется когда юзер проскроллил сайт
   window.addEventListener('scroll', showModalByScroll);
 
-	
   // Использую классы для карточек
 
-	// получаю карточки
+  // получаю карточки
   class MenuCard {
-		// путь к картинке, альт текст, заголовок, описание, цена, родитель куда помещаются карточки
-		// ...classes это rest оператор
+    // путь к картинке, альт текст, заголовок, описание, цена, родитель куда помещаются карточки
+    // ...classes это rest оператор
     constructor(src, alt, title, descr, price, parentSelector, ...classes) {
       this.src = src;
       this.alt = alt;
       this.title = title;
       this.descr = descr;
       this.price = price;
-			// передаем рекст оператор, он передается как массив
-			this.classes = classes;
-			//  в this.parent кладем ДОМ элемент
-			this.parent = document.querySelector(parentSelector); // можно так же в render() делать
-			// для курса валют
-			this.transfer = 27;
-			// вызываем метод конвертации валюты
-			this.changeToUAH(); // его можно было так же и в методе render() вызывать
+      // передаем рекст оператор, он передается как массив
+      this.classes = classes;
+      //  в this.parent кладем ДОМ элемент
+      this.parent = document.querySelector(parentSelector); // можно так же в render() делать
+      // для курса валют
+      this.transfer = 27;
+      // вызываем метод конвертации валюты
+      this.changeToUAH(); // его можно было так же и в методе render() вызывать
     }
 
-		// метод конвертации валют
-		changeToUAH() {
-			// умножаем цену на курс
-			this.price = this.price * this.transfer;
-			// можно написать +this.price чтобы строка преобразовывалась в число
-			// this.price = +this.price * this.transfer;
-		}
+    // метод конвертации валют
+    changeToUAH() {
+      // умножаем цену на курс
+      this.price = this.price * this.transfer;
+      // можно написать +this.price чтобы строка преобразовывалась в число
+      // this.price = +this.price * this.transfer;
+    }
 
     render() {
-			// метод конвертации валют changeToUAH() можно и тут вызвать. или в конструкторе
-			
-			// тут пишем верстку
-			// создаем див
-			const element = document.createElement('div');
-			
-			// назначаем классы this.classes который через rest оператор записан 
+      // метод конвертации валют changeToUAH() можно и тут вызвать. или в конструкторе
 
-			// если в ...classes ничего не передается, то присваиваем класс menu__item
-			if (this.classes.length === 0) {
-				// element.classList.add('menu__item'); // так можно но есть круче способ ниже
+      // тут пишем верстку
+      // создаем див
+      const element = document.createElement('div');
 
-				// записываем класс menu__item в свойства this.element
-				this.element = 'menu__item';
-				element.classList.add(this.element);
-			} else {
-				// className называем каждый элемент внутри массива. className это аргумент => функции
-				this.classes.forEach(className => element.classList.add(className)); // element это переменная которая выше создана
-			}
+      // назначаем классы this.classes который через rest оператор записан
+
+      // если в ...classes ничего не передается, то присваиваем класс menu__item
+      if (this.classes.length === 0) {
+        // element.classList.add('menu__item'); // так можно но есть круче способ ниже
+
+        // записываем класс menu__item в свойства this.element
+        this.element = 'menu__item';
+        element.classList.add(this.element);
+      } else {
+        // className называем каждый элемент внутри массива. className это аргумент => функции
+        this.classes.forEach((className) => element.classList.add(className)); // element это переменная которая выше создана
+      }
 
       element.innerHTML = `
 			<!-- убираем обвертку div class="menu__item", она будет ниже в new MenuCard()-->
@@ -285,56 +284,173 @@ window.addEventListener('DOMContentLoaded', () => {
 					<div class="menu__item-total"><span>${this.price}</span> грн/день</div>
 				</div>
 			`;
-			// наш новый созданный ДОМ элемент помещаем в element
-			this.parent.append(element);
+      // наш новый созданный ДОМ элемент помещаем в element
+      this.parent.append(element);
     }
   }
 
-	// надо создать новый объект и вызвать метод render()
+  // надо создать новый объект и вызвать метод render()
 
-	// можно импользовать такой синтаксис
-	// const div = new MenuCard(сюда аргументы);
-	// div.render();
+  // можно импользовать такой синтаксис
+  // const div = new MenuCard(сюда аргументы);
+  // div.render();
 
-	// но есть метод сокращенней
-	// используем объект без помещения в переменную
-	// так можно делать если используешь на месте. потом доступа к этому объекту не будет
-	new MenuCard(
-		// вставляем аргументы src, alt, title и т.д.
-		// вставляем с кавычками 
-		"img/tabs/vegy.jpg",
-		"vegy",
-		// то что имеет свои ковычки то в одинарные 
-		'Меню "Фитнес"',
-		'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-		// это число как я понял условное просто 9 долларов типо из базы данных ему приходит
-		9,
-		// родительский селектор parentSelector; в верстке есть класс меню а в нем класс контейнер
-		'.menu .container',
-		// добавляем класс обвертку menu__item (без .) из метода render()
-		'menu__item'
-	).render();
+  // но есть метод сокращенней
+  // используем объект без помещения в переменную
+  // так можно делать если используешь на месте. потом доступа к этому объекту не будет
+  new MenuCard(
+    // вставляем аргументы src, alt, title и т.д.
+    // вставляем с кавычками
+    'img/tabs/vegy.jpg',
+    'vegy',
+    // то что имеет свои ковычки то в одинарные
+    'Меню "Фитнес"',
+    'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+    // это число как я понял условное просто 9 долларов типо из базы данных ему приходит
+    9,
+    // родительский селектор parentSelector; в верстке есть класс меню а в нем класс контейнер
+    '.menu .container',
+    // добавляем класс обвертку menu__item (без .) из метода render()
+    'menu__item'
+  ).render();
 
-	// пишем еще 2 карточки
-	new MenuCard(
-		"img/tabs/elite.jpg",
-		"elite",
-		'Меню "Премиум"',
-		'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-		14,
-		'.menu .container',
-		// добавляем класс обвертку menu__item (без .) из метода render()
-		'menu__item'
-	).render();
+  // пишем еще 2 карточки
+  new MenuCard(
+    'img/tabs/elite.jpg',
+    'elite',
+    'Меню "Премиум"',
+    'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
+    14,
+    '.menu .container',
+    // добавляем класс обвертку menu__item (без .) из метода render()
+    'menu__item'
+  ).render();
 
-	new MenuCard(
-		"img/tabs/post.jpg",
-		"post",
-		'Меню "Постное"',
-		'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-		21,
-		'.menu .container',
-		// тут специально нет menu__item
-		// мы его добавили через условие if (this.classes.length === 0) в методе render()
-	).render();
+  new MenuCard(
+    'img/tabs/post.jpg',
+    'post',
+    'Меню "Постное"',
+    'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
+    21,
+    '.menu .container'
+    // тут специально нет menu__item
+    // мы его добавили через условие if (this.classes.length === 0) в методе render()
+  ).render();
+
+	
+	// Forms
+	// реализуем отправку данных форм, т.к. их 2 то делаем чер функ
+
+	// получаем формы
+	const forms = document.querySelectorAll('form');
+
+	// объект который будет вводть юзеру сообщение в зависимости от ситуации
+	const message = {
+		loading: 'Загрузка',
+		succes: 'Спасибо! Скоро мы с вами свяжемся',
+		failure: 'Что-то пошло не так...'
+	};
+
+	// подвязываем под все формы postData
+	forms.forEach(item => {
+		postData(item);
+	});
+
+	// функция отвечающая за постинг данных
+	function postData(form) {
+		// событие 'submit', (объект событие) срабатывает каждый раз когда пытаемся отправить форму
+		form.addEventListener('submit', (e) => {
+			// отменяем стандартное поведение браузера
+			e.preventDefault(); // надо писать в начале
+
+			// при отправки запроса юзера будем уведомлять
+			// создаем див
+			const statusMessage = document.createElement('div');
+			// добавляем диву класс
+			statusMessage.classList.add('status');
+			// как только отправили запрос нажали submit (кнопку отправки формы) выводим сообщение loading: 'Загрузка' (увидит тока если медленный интернет)
+			statusMessage.textContent = message.loading;
+			// отправляем на страницу statusMessage
+			form.append(statusMessage);
+
+			// работаем с объектом XMLHttpRequest
+			const request = new XMLHttpRequest();
+			// open(метод ПОСТ, путь на который ссылаемся)
+			request.open('POST', 'server.php');
+
+			// заголовки которые говорят серверу, что именно приходит (тип контента, обязательно для formData)
+			// request.setRequestHeader('Content-type', 'multipart/form-data'); // setRequestHeader не нужно писать используя XMLHttpRequest + formData приводит к ошибке
+			request.setRequestHeader('Content-type', 'application/json'); // через JSON
+
+			// нужно сделать так чтобы все данные кот заполнил юзер в форме мы полуили в жс и могли отправить на сервер
+
+			// 1) через formData
+			// в перемен конструктор FormData(форма из которой нужно собрать данные)
+			// const formData = new FormData(form); // ! важно чтобы в верстке у input были атрибуты name
+
+			// // отправляем данные send(переменная formData)
+			// request.send(formData);
+
+			// load отслеживает конечную загрузку запроса
+			// request.addEventListener('load', () => {
+			// 	// 200 это OK
+			// 	if (request.status === 200) {
+			// 		// response это ответ от сервера
+			// 		console.log(request.response);
+			// 		// когда мы сделали запрос и все успешно пришло выводим сообщение succes: 'Спасибо! Скоро мы с вами свяжемся'
+			// 		statusMessage.textContent = message.succes;
+
+			// 		// очистка формы после успешной отправки
+			// 		form.reset(); // обращаемся к форме и метод reset() очищает ее. альтернатива это в этой форме перебрать инпуты и очистить их вэлью
+			// 		// удаляем statusMessage со страницы
+			// 		setTimeout(() => {
+			// 			statusMessage.remove();
+			// 		}, 2000);
+			// 	} else { // если что-то не вышло
+			// 		// выводим сообщение failure: 'Что-то пошло не так...'
+			// 		statusMessage.textContent = message.failure;
+			// 	}
+			// });
+
+			// 2) через JSON
+			// в перемен конструктор FormData(форма из которой нужно собрать данные)
+			const formData = new FormData(form); // ! важно чтобы в верстке у input были атрибуты name
+
+			// надо объект FormData превратить в формат JSON
+			// FormData специфический объект и так просто его нельзя прогнать в другой формат. для этого делаем:
+
+			// создаем пустой объект
+			const object = {};
+			// перебираем FormData и все данные помещаем в object
+			formData.forEach(function (value, key) {
+				object[key] = value;
+			});
+			// теперь когда мы получили обычный объект а не FormData, можем использовать конвертацию в JSON
+			const json = JSON.stringify(object);
+
+			// // отправляем данные send(переменная formData)
+			request.send(json);
+
+			// load отслеживает конечную загрузку запроса
+			request.addEventListener('load', () => {
+				// 200 это OK
+				if (request.status === 200) {
+					// response это ответ от сервера
+					console.log(request.response);
+					// когда мы сделали запрос и все успешно пришло выводим сообщение succes: 'Спасибо! Скоро мы с вами свяжемся'
+					statusMessage.textContent = message.succes;
+
+					// очистка формы после успешной отправки
+					form.reset(); // обращаемся к форме и метод reset() очищает ее. альтернатива это в этой форме перебрать инпуты и очистить их вэлью
+					// удаляем statusMessage со страницы
+					setTimeout(() => {
+						statusMessage.remove();
+					}, 2000);
+				} else { // если что-то не вышло
+					// выводим сообщение failure: 'Что-то пошло не так...'
+					statusMessage.textContent = message.failure;
+				}
+			});
+		});
+	}
 });
