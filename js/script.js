@@ -136,8 +136,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // Modal
 
   const modalTrigger = document.querySelectorAll('[data-modal]'),
-    modal = document.querySelector('.modal'),
-    modalCloseBtn = document.querySelector('[data-close]');
+    modal = document.querySelector('.modal');
 
   // modalTrigger.forEach(btn => {
   //   btn.addEventListener('click', () => {
@@ -170,8 +169,6 @@ window.addEventListener('DOMContentLoaded', () => {
     document.body.style.overflow = '';
   }
 
-  modalCloseBtn.addEventListener('click', closeModal);
-
   // альтернатива методов modalTrigger и modalCloseBtn выше с тоггл
   // modalTrigger.forEach((modalTrigger) => {
   //   modalTrigger.addEventListener('click', () => {
@@ -189,8 +186,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // закрытие модалки при клике за пределы модалки
   modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      closeModal();
+		// если е.таргет явлеется modal или е.таргет будет крестиком (получаем атрибут data-close) и равен пустой строке
+    if (e.target === modal || e.target.getAttribute('data-close') == '') {
+      closeModal(); // то мы закрывает модалку
     }
   });
 
@@ -203,7 +201,7 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   // модалка появляется спустя время на сайте
-  const modalTimerId = setTimeout(openModal, 5000);
+  const modalTimerId = setTimeout(openModal, 50000);
 
   // функция появления модалки
   function showModalByScroll() {
@@ -346,7 +344,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	// объект который будет вводть юзеру сообщение в зависимости от ситуации
 	const message = {
-		loading: 'Загрузка',
+		loading: 'img/form/spinner.svg',
 		succes: 'Спасибо! Скоро мы с вами свяжемся',
 		failure: 'Что-то пошло не так...'
 	};
@@ -364,14 +362,22 @@ window.addEventListener('DOMContentLoaded', () => {
 			e.preventDefault(); // надо писать в начале
 
 			// при отправки запроса юзера будем уведомлять
-			// создаем див
-			const statusMessage = document.createElement('div');
-			// добавляем диву класс
-			statusMessage.classList.add('status');
-			// как только отправили запрос нажали submit (кнопку отправки формы) выводим сообщение loading: 'Загрузка' (увидит тока если медленный интернет)
-			statusMessage.textContent = message.loading;
+			// создаем img
+			const statusMessage = document.createElement('img');
+			// обращаемся к атрибуту
+			statusMessage.src = message.loading;
+			// как только отправили запрос нажали submit (кнопку отправки формы)  (увидит тока если медленный интернет)
+			statusMessage.style.cssText = `
+				display: block;
+				margin: 0 auto;
+			`;
+
 			// отправляем на страницу statusMessage
-			form.append(statusMessage);
+			// form.append(statusMessage); // тут спинер ломает внизу верстку где форма не в модалке
+			// аппендит спинер не в саму форму а после нее. в модалке ниче не поменяется
+			// insertAdjacentElement('куда вставляем afterend это после формы', что нужно вставить)
+			form.insertAdjacentElement('afterend', statusMessage);
+
 
 			// работаем с объектом XMLHttpRequest
 			const request = new XMLHttpRequest();
@@ -438,19 +444,53 @@ window.addEventListener('DOMContentLoaded', () => {
 					// response это ответ от сервера
 					console.log(request.response);
 					// когда мы сделали запрос и все успешно пришло выводим сообщение succes: 'Спасибо! Скоро мы с вами свяжемся'
-					statusMessage.textContent = message.succes;
+					showThanksModal(message.succes);
 
 					// очистка формы после успешной отправки
 					form.reset(); // обращаемся к форме и метод reset() очищает ее. альтернатива это в этой форме перебрать инпуты и очистить их вэлью
 					// удаляем statusMessage со страницы
-					setTimeout(() => {
-						statusMessage.remove();
-					}, 2000);
+					statusMessage.remove();
 				} else { // если что-то не вышло
 					// выводим сообщение failure: 'Что-то пошло не так...'
-					statusMessage.textContent = message.failure;
+					showThanksModal(message.failure);
 				}
 			});
 		});
+	}
+	// функция показывает модалку с благодарностью юзеру/ message это будет сообщ кот будет показ юзеру о статусе отправки
+	function showThanksModal(message) { // message будем брать из const message котор выше писали при отправке запросов
+		const prevModalDialog = document.querySelector('.modal__dialog');
+
+		// скрываем этот блок (не удаляем т к юзер может открыть модалку и попытаться отправить форму)
+		prevModalDialog.classList.add('hide');
+
+
+		// задача открыть класс модал и сформировать структуру внутри
+
+		// открываем модалку openModal() есть выше в коде когда писали модалку
+		openModal();
+
+		// нужно создать блок обвертка
+		const thanksModal = document.createElement('div'); // создаем див
+		// добавляем класс. по сути заменяем класс тот что выше скрыли
+		thanksModal.classList.add('modal__dialog');
+		// формируем внутри верстку
+		thanksModal.innerHTML = `
+			<div class='modal__content'>
+				<div class='modal__close' data-close>×</div>
+				<div class='modal__title'>${message}</div>
+			</div>
+		`;
+		// помещаем на страницу thanksModal
+		document.querySelector('.modal').append(thanksModal);
+
+		// нужно чтобы все через время возвращалось обратно
+		setTimeout(() => {
+			thanksModal.remove(); // убирать thanksModal
+			// показывать предидущий контент
+			prevModalDialog.classList.add('show');  // доб класс show
+			prevModalDialog.classList.remove('hide'); // убир класс hide
+			closeModal(); // закр мод окно
+		}, 2000);
 	}
 });
