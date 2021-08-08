@@ -379,51 +379,42 @@ window.addEventListener('DOMContentLoaded', () => {
 			form.insertAdjacentElement('afterend', statusMessage);
 
 
-			// работаем с объектом XMLHttpRequest
-			const request = new XMLHttpRequest();
-			// open(метод ПОСТ, путь на который ссылаемся)
-			request.open('POST', 'server.php');
+			// работа с сервером fetch api
 
-			// заголовки которые говорят серверу, что именно приходит (тип контента, обязательно для formData)
-			// request.setRequestHeader('Content-type', 'multipart/form-data'); // setRequestHeader не нужно писать используя XMLHttpRequest + formData приводит к ошибке
-			request.setRequestHeader('Content-type', 'application/json'); // через JSON
+	// 		// 1) через FormData
+	// 		// в перемен конструктор FormData(форма из которой нужно собрать данные)
+	// 		const formData = new FormData(form); // ! важно чтобы в верстке у input были атрибуты name
 
-			// нужно сделать так чтобы все данные кот заполнил юзер в форме мы полуили в жс и могли отправить на сервер
 
-			// 1) через formData
-			// в перемен конструктор FormData(форма из которой нужно собрать данные)
-			// const formData = new FormData(form); // ! важно чтобы в верстке у input были атрибуты name
+	// 		// работаем с fetch(будем обращаться к server.php)
+	// 		fetch('server.php', {
+	// 			method: 'POST', // метод
+	// 			body: formData // то тело которое мы будем отправлять
+	// 		})
+	// 		.then(data => data.text()) // модифицируем ответ чтобы он пришел как текст
+	// 		.then(data => { // обрабатываем результат запроса через промисы
+	// 			// с сервера вернется data
+	// 			console.log(data);
+	// 			// когда мы сделали запрос и все успешно пришло выводим сообщение succes: 'Спасибо! Скоро мы с вами свяжемся'
+	// 			showThanksModal(message.succes);
+	// 			// удаляем statusMessage со страницы
+	// 			statusMessage.remove();
+	// 		}).catch(() => {  // пишем операцию которая соотвествует ошибке
+					// catch() есть особенность если к примеру указать путь к серверу не тот, то он все равно выполнит resolve. а вот если к примеру нет сети 404 ошибка и тогда он выполнит reject
+	// 			// выводим сообщение failure: 'Что-то пошло не так...'
+	// 			showThanksModal(message.failure);
+	// 		}).finally(() => { // действие которое будет выполняться всегда вне зависимости от результата
+	// 			// очистка формы после успешной отправки
+	// 			form.reset(); // обращаемся к форме и метод reset() очищает ее. альтернатива это в этой форме перебрать инпуты и очистить их вэлью
+	// 		});
+	// 	});
+	// }
 
-			// // отправляем данные send(переменная formData)
-			// request.send(formData);
-
-			// load отслеживает конечную загрузку запроса
-			// request.addEventListener('load', () => {
-			// 	// 200 это OK
-			// 	if (request.status === 200) {
-			// 		// response это ответ от сервера
-			// 		console.log(request.response);
-			// 		// когда мы сделали запрос и все успешно пришло выводим сообщение succes: 'Спасибо! Скоро мы с вами свяжемся'
-			// 		statusMessage.textContent = message.succes;
-
-			// 		// очистка формы после успешной отправки
-			// 		form.reset(); // обращаемся к форме и метод reset() очищает ее. альтернатива это в этой форме перебрать инпуты и очистить их вэлью
-			// 		// удаляем statusMessage со страницы
-			// 		setTimeout(() => {
-			// 			statusMessage.remove();
-			// 		}, 2000);
-			// 	} else { // если что-то не вышло
-			// 		// выводим сообщение failure: 'Что-то пошло не так...'
-			// 		statusMessage.textContent = message.failure;
-			// 	}
-			// });
 
 			// 2) через JSON
 			// в перемен конструктор FormData(форма из которой нужно собрать данные)
 			const formData = new FormData(form); // ! важно чтобы в верстке у input были атрибуты name
 
-			// надо объект FormData превратить в формат JSON
-			// FormData специфический объект и так просто его нельзя прогнать в другой формат. для этого делаем:
 
 			// создаем пустой объект
 			const object = {};
@@ -431,32 +422,37 @@ window.addEventListener('DOMContentLoaded', () => {
 			formData.forEach(function (value, key) {
 				object[key] = value;
 			});
-			// теперь когда мы получили обычный объект а не FormData, можем использовать конвертацию в JSON
-			const json = JSON.stringify(object);
 
-			// // отправляем данные send(переменная formData)
-			request.send(json);
 
-			// load отслеживает конечную загрузку запроса
-			request.addEventListener('load', () => {
-				// 200 это OK
-				if (request.status === 200) {
-					// response это ответ от сервера
-					console.log(request.response);
-					// когда мы сделали запрос и все успешно пришло выводим сообщение succes: 'Спасибо! Скоро мы с вами свяжемся'
-					showThanksModal(message.succes);
-
-					// очистка формы после успешной отправки
-					form.reset(); // обращаемся к форме и метод reset() очищает ее. альтернатива это в этой форме перебрать инпуты и очистить их вэлью
-					// удаляем statusMessage со страницы
-					statusMessage.remove();
-				} else { // если что-то не вышло
-					// выводим сообщение failure: 'Что-то пошло не так...'
-					showThanksModal(message.failure);
-				}
+			// работаем с fetch(будем обращаться к server.php)
+			fetch('server.php', {
+				method: 'POST', // метод
+				headers: { // заголовки
+					'Content-type': 'application/json'
+				},
+				body: JSON.stringify(object) // то тело которое мы будем отправлять
+			})
+			.then(data => data.text()) // модифицируем ответ чтобы он пришел как текст
+			.then(data => { // обрабатываем результат запроса через промисы
+				// с сервера вернется data
+				console.log(data);
+				// когда мы сделали запрос и все успешно пришло выводим сообщение succes: 'Спасибо! Скоро мы с вами свяжемся'
+				showThanksModal(message.succes);
+				// удаляем statusMessage со страницы
+				statusMessage.remove();
+			}).catch(() => {  // пишем операцию которая соотвествует ошибке
+				// catch() есть особенность если к примеру указать путь к серверу не тот, то он все равно выполнит resolve. а вот если к примеру нет сети 404 ошибка и тогда он выполнит reject
+				// выводим сообщение failure: 'Что-то пошло не так...'
+				showThanksModal(message.failure);
+			}).finally(() => { // действие которое будет выполняться всегда вне зависимости от результата
+				// очистка формы после успешной отправки
+				form.reset(); // обращаемся к форме и метод reset() очищает ее. альтернатива это в этой форме перебрать инпуты и очистить их вэлью
 			});
 		});
 	}
+
+
+
 	// функция показывает модалку с благодарностью юзеру/ message это будет сообщ кот будет показ юзеру о статусе отправки
 	function showThanksModal(message) { // message будем брать из const message котор выше писали при отправке запросов
 		const prevModalDialog = document.querySelector('.modal__dialog');
