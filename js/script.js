@@ -452,7 +452,6 @@ window.addEventListener('DOMContentLoaded', () => {
 	}
 
 
-
 	// функция показывает модалку с благодарностью юзеру/ message это будет сообщ кот будет показ юзеру о статусе отправки
 	function showThanksModal(message) { // message будем брать из const message котор выше писали при отправке запросов
 		const prevModalDialog = document.querySelector('.modal__dialog');
@@ -489,4 +488,9 @@ window.addEventListener('DOMContentLoaded', () => {
 			closeModal(); // закр мод окно
 		}, 2000);
 	}
+
+	// работа с базой данных
+	fetch('http://localhost:3000/menu') // обращаемся db.json
+		.then(data => data.json()) // data ответ от сервера превращаем в json объект
+		.then(res => console.log(res));
 });
