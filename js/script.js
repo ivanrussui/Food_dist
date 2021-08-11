@@ -271,14 +271,12 @@ window.addEventListener('DOMContentLoaded', () => {
       }
 
       element.innerHTML = `
-			<!-- убираем обвертку div class="menu__item", она будет ниже в new MenuCard()-->
 				<img src=${this.src} alt=${this.alt}>
 				<h3 class="menu__item-subtitle">${this.title}</h3>
 				<div class="menu__item-descr">${this.descr}</div>
 				<div class="menu__item-divider"></div>
 				<div class="menu__item-price">
 					<div class="menu__item-cost">Цена:</div>
-					<!-- заметь в ${this.price} падает цена конвертированная с помощью метода this.changeToUAH(); -->
 					<div class="menu__item-total"><span>${this.price}</span> грн/день</div>
 				</div>
 			`;
@@ -287,55 +285,75 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // надо создать новый объект и вызвать метод render()
+	// функция для получения данных с сервера
+	const getRecource =  async (url) => { // url кот передается в fetch, data нет т.к. ниче не отправляем
+		// обрабатываем данные которые пришли
+		// await как бы (наподобие) делает синхронным, говорит надо дождаться
+		const res = await fetch(url);
 
-  // можно импользовать такой синтаксис
-  // const div = new MenuCard(сюда аргументы);
-  // div.render();
+		// fetch если столкнет с ошибкой http 404 и др. он не выдаст ошибку-catch-reject
+		// ошибкой для fetch будет отсутствие инета и др. поэтому надо такое поведение обработать
+		if (!res.ok) { // если в запросе что-то не так
+			throw new Error(`Cloud not fetch ${url}, status: ${res.status}`); // выбрасываем ошибку()
+		}
+		
+		// возвращаем как json формат
+		return await res.json(); // res это промис
+	};
 
-  // но есть метод сокращенней
-  // используем объект без помещения в переменную
-  // так можно делать если используешь на месте. потом доступа к этому объекту не будет
-  new MenuCard(
-    // вставляем аргументы src, alt, title и т.д.
-    // вставляем с кавычками
-    'img/tabs/vegy.jpg',
-    'vegy',
-    // то что имеет свои ковычки то в одинарные
-    'Меню "Фитнес"',
-    'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-    // это число как я понял условное просто 9 долларов типо из базы данных ему приходит
-    9,
-    // родительский селектор parentSelector; в верстке есть класс меню а в нем класс контейнер
-    '.menu .container',
-    // добавляем класс обвертку menu__item (без .) из метода render()
-    'menu__item'
-  ).render();
+	// создание элементов динамически:
 
-  // пишем еще 2 карточки
-  new MenuCard(
-    'img/tabs/elite.jpg',
-    'elite',
-    'Меню "Премиум"',
-    'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-    14,
-    '.menu .container',
-    // добавляем класс обвертку menu__item (без .) из метода render()
-    'menu__item'
-  ).render();
+	// 1) вариант классами видимо
+	// getRecource('http://localhost:3000/menu') // url берем из терминала
+	// 	.then(data => {	// данные приходящие с сервера, приходят как массив
+	// 		data.forEach(({img, altimg, title, descr, price}) => { // используем дестуктуризацию - получаем значения ключей
+	// 			new MenuCard(img, altimg, title, descr, price, '.menu .container').render(); // вызваем конструктор MenuCard(в конце 'куда вставляем в верстку').метод render()
+	// 		});
+	// 	});
 
-  new MenuCard(
-    'img/tabs/post.jpg',
-    'post',
-    'Меню "Постное"',
-    'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-    21,
-    '.menu .container'
-    // тут специально нет menu__item
-    // мы его добавили через условие if (this.classes.length === 0) в методе render()
-  ).render();
+	// // 2) вариант отличие в том, что он не использует классы, а формирует верстку на лету
+	// // здесь нет шаблонизации, катит если надо только 1н раз что-то построить
+	// getRecource('http://localhost:3000/menu') // url берем из терминала
+	// 	.then(data => createCard(data)); // .then(данные => функция(данные))
 
+	// function createCard(data) { // функция создающая карточку
+	// 	data.forEach((({img, altimg, title, descr, price}) => { // дестуктуризация
+	// 		const element = document.createElement('div'); // создаем элемент
+	// 		element.classList.add('menu__item'); // добавляем класс
+
+	// 		// вставляем верстку 
+	// 		element.innerHTML = ` 
+	// 			<img src=${img} alt=${altimg}>
+	// 			<h3 class="menu__item-subtitle">${title}</h3>
+	// 			<div class="menu__item-descr">${descr}</div>
+	// 			<div class="menu__item-divider"></div>
+	// 			<div class="menu__item-price">
+	// 				<div class="menu__item-cost">Цена:</div>
+	// 				<div class="menu__item-total"><span>${price * 27}</span> грн/день</div>
+	// 			</div>
+	// 		`;
+
+	// 		// получаем селектор и аппендим-вставляем(созданный элемент)
+	// 		document.querySelector('.menu .container').append(element);
+	// 	}));
+	// }
+
+
+
+	// теперь не рабтает тк данные карточки приходят из БД
+	// ровняю среднюю карточку с крайними, она короче получалась. сделал неск вариантов
+	const menuItem = document.querySelectorAll('.menu__item-descr');
+	// const menuItem = document.querySelectorAll('.menu__item-divider');
 	
+	// menuItem[1].style.padding = '0 21px';
+	// menuItem[1].style.marginTop = '59px';
+
+	menuItem.forEach(element => {
+		element.style.padding = '0 21px';
+	});
+
+
+
 	// Forms
 	// реализуем отправку данных форм, т.к. их 2 то делаем чер функ
 
@@ -349,13 +367,30 @@ window.addEventListener('DOMContentLoaded', () => {
 		failure: 'Что-то пошло не так...'
 	};
 
-	// подвязываем под все формы postData
+	// подвязываем под все формы bindPostData
 	forms.forEach(item => {
-		postData(item);
+		bindPostData(item);
 	});
 
 	// функция отвечающая за постинг данных
-	function postData(form) {
+	// async говорит что будет асинхронный код
+	// async await всегда используются в паре
+	const postData =  async (url, data) => { // url кот передается в fetch, data данные которые будут поститься
+		// обрабатываем данные которые пришли
+		// await как бы (наподобие) делает синхронным, говорит надо дождаться
+		const res = await fetch(url, { // fetch(url чтобы ссылаться на сервер)
+			method: 'POST', // метод
+			headers: { // заголовки
+				'Content-type': 'application/json'
+			},
+			body: data // то тело которое мы будем отправлять
+		});
+		// возвращаем как json формат
+		return await res.json(); // res это промис
+	};
+
+	// функция отвечающая за привязку постинга
+	function bindPostData(form) {
 		// событие 'submit', (объект событие) срабатывает каждый раз когда пытаемся отправить форму
 		form.addEventListener('submit', (e) => {
 			// отменяем стандартное поведение браузера
@@ -413,26 +448,16 @@ window.addEventListener('DOMContentLoaded', () => {
 
 			// 2) через JSON
 			// в перемен конструктор FormData(форма из которой нужно собрать данные)
+			// берем formData которая собрала все данные с формы
 			const formData = new FormData(form); // ! важно чтобы в верстке у input были атрибуты name
 
+			// entries() превращает объект в массив массивов т.е. в матрицу
+			// fromEntries() делает обратно из матрицы в объект
+			// данные с формы полученные выше превращаем в матрицу, после в классический объект, а после в JSON
+			const json = JSON.stringify(Object.fromEntries(formData.entries())); 
 
-			// создаем пустой объект
-			const object = {};
-			// перебираем FormData и все данные помещаем в object
-			formData.forEach(function (value, key) {
-				object[key] = value;
-			});
-
-
-			// работаем с fetch(будем обращаться к server.php)
-			fetch('server.php', {
-				method: 'POST', // метод
-				headers: { // заголовки
-					'Content-type': 'application/json'
-				},
-				body: JSON.stringify(object) // то тело которое мы будем отправлять
-			})
-			.then(data => data.text()) // модифицируем ответ чтобы он пришел как текст
+			// JSON полученный выше отправляем на сервер
+			postData('http://localhost:3000/requests', json) // (url, body который пойдет на сервер)
 			.then(data => { // обрабатываем результат запроса через промисы
 				// с сервера вернется data
 				console.log(data);
@@ -490,7 +515,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	}
 
 	// работа с базой данных
-	fetch('http://localhost:3000/menu') // обращаемся db.json
+	fetch('http://localhost:3000/menu') // обращаемся db.json 'адрес при запуске сервера npx json-server db.json'
 		.then(data => data.json()) // data ответ от сервера превращаем в json объект
 		.then(res => console.log(res));
 });
