@@ -286,7 +286,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
 	// функция для получения данных с сервера
-	const getRecource =  async (url) => { // url кот передается в fetch, data нет т.к. ниче не отправляем
+	const getResource =  async (url) => { // url кот передается в fetch, data нет т.к. ниче не отправляем
 		// обрабатываем данные которые пришли
 		// await как бы (наподобие) делает синхронным, говорит надо дождаться
 		const res = await fetch(url);
@@ -303,8 +303,16 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	// создание элементов динамически:
 
+	// ! вместо вариантов ниже пишу через библиотеку axios
+	axios.get('http://localhost:3000/menu')
+		.then(data => {
+			data.data.forEach(({img, altimg, title, descr, price}) => { // используем дестуктуризацию - получаем значения ключей
+				new MenuCard(img, altimg, title, descr, price, '.menu .container').render(); // вызваем конструктор MenuCard(в конце 'куда вставляем в верстку').метод render()
+			});
+		});
+	
 	// 1) вариант классами видимо
-	// getRecource('http://localhost:3000/menu') // url берем из терминала
+	// getResource('http://localhost:3000/menu') // url берем из терминала
 	// 	.then(data => {	// данные приходящие с сервера, приходят как массив
 	// 		data.forEach(({img, altimg, title, descr, price}) => { // используем дестуктуризацию - получаем значения ключей
 	// 			new MenuCard(img, altimg, title, descr, price, '.menu .container').render(); // вызваем конструктор MenuCard(в конце 'куда вставляем в верстку').метод render()
@@ -313,7 +321,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	// // 2) вариант отличие в том, что он не использует классы, а формирует верстку на лету
 	// // здесь нет шаблонизации, катит если надо только 1н раз что-то построить
-	// getRecource('http://localhost:3000/menu') // url берем из терминала
+	// getResource('http://localhost:3000/menu') // url берем из терминала
 	// 	.then(data => createCard(data)); // .then(данные => функция(данные))
 
 	// function createCard(data) { // функция создающая карточку
@@ -342,15 +350,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	// теперь не рабтает тк данные карточки приходят из БД
 	// ровняю среднюю карточку с крайними, она короче получалась. сделал неск вариантов
-	const menuItem = document.querySelectorAll('.menu__item-descr');
-	// const menuItem = document.querySelectorAll('.menu__item-divider');
+	// const menuItem = document.querySelectorAll('.menu__item-descr');
+	// // const menuItem = document.querySelectorAll('.menu__item-divider');
 	
-	// menuItem[1].style.padding = '0 21px';
-	// menuItem[1].style.marginTop = '59px';
+	// // menuItem[1].style.padding = '0 21px';
+	// // menuItem[1].style.marginTop = '59px';
 
-	menuItem.forEach(element => {
-		element.style.padding = '0 21px';
-	});
+	// menuItem.forEach(element => {
+	// 	element.style.padding = '0 21px';
+	// });
 
 
 
@@ -514,8 +522,8 @@ window.addEventListener('DOMContentLoaded', () => {
 		}, 2000);
 	}
 
-	// работа с базой данных
-	fetch('http://localhost:3000/menu') // обращаемся db.json 'адрес при запуске сервера npx json-server db.json'
-		.then(data => data.json()) // data ответ от сервера превращаем в json объект
-		.then(res => console.log(res));
+	// // работа с базой данных
+	// fetch('http://localhost:3000/menu') // обращаемся db.json 'адрес при запуске сервера npx json-server db.json'
+	// 	.then(data => data.json()) // data ответ от сервера превращаем в json объект
+	// 	.then(res => console.log(res));
 });
