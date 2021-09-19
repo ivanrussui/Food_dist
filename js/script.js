@@ -304,7 +304,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	// создание элементов динамически:
 
 	// ! вместо вариантов ниже пишу через библиотеку axios
-	axios.get('http://localhost:3000/menu')
+	axios.get('http://localhost:3000/menu') 
 		.then(data => {
 			data.data.forEach(({img, altimg, title, descr, price}) => { // используем дестуктуризацию - получаем значения ключей
 				new MenuCard(img, altimg, title, descr, price, '.menu .container').render(); // вызваем конструктор MenuCard(в конце 'куда вставляем в верстку').метод render()
@@ -526,4 +526,63 @@ window.addEventListener('DOMContentLoaded', () => {
 	// fetch('http://localhost:3000/menu') // обращаемся db.json 'адрес при запуске сервера npx json-server db.json'
 	// 	.then(data => data.json()) // data ответ от сервера превращаем в json объект
 	// 	.then(res => console.log(res));
+
+	// ! Slider
+
+	const slides = document.querySelectorAll('.offer__slide'),
+		prev = document.querySelector('.offer__slider-prev'),
+		next = document.querySelector('.offer__slider-next'),
+		total = document.querySelector('#total'),
+		current = document.querySelector('#current');
+	
+	// индекс определяющий текущее положение в слайдере
+	let slideIndex = 1; // 1 тк в прогр идет с 0
+
+	// инициализируем слайдер, чтобы он вначале появился
+	showSlides(slideIndex);
+
+	// условие чтобы подставлялся динамически тотал - сколько всего слайдов
+	if (slides.length < 10) {
+		total.textContent = `0${slides.length}`;
+	}	else {
+		total.textContent = slides.length;
+	}
+
+	// функция показа и скрытия слайдов
+	function showSlides(n) { // n это наш слайд индекс
+		// если ушли в правую границу (конец слайдера) то перемещаемся в начало
+		if (n > slides.length) { 
+			slideIndex = 1;
+		}
+		
+		// если ушли в левую границу (начало слайдера) то перемещаемся в конец
+		if ( n < 1) {
+			slideIndex = slides.length;
+		}
+
+		// скрываем все слайды кроме того который должен быть
+		slides.forEach(item => item.style.display = 'none'); // тут скрываем все слайды
+
+		slides[slideIndex - 1].style.display = 'block'; // тут показываем нужный слайд
+
+		// условие чтобы подставлялся динамически current - какой сечас по счету слайд
+		if (slides.length < 10) {
+			current.textContent = `0${slideIndex}`;
+		}	else {
+			current.textContent = slideIndex;
+		}
+	}
+
+	// функция изменяющая слайд индекс
+	function plusSlides(n) {
+		showSlides(slideIndex += n); // вызываем функцию showSlides  += n тут приходит условие из функ showSlides
+	}
+
+	prev.addEventListener('click', () => {
+		plusSlides(-1); // минус 1 слайд
+	});
+
+	next.addEventListener('click', () => {
+		plusSlides(1); // плюс 1 слайд
+	});
 });
