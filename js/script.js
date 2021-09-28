@@ -304,26 +304,26 @@ window.addEventListener('DOMContentLoaded', () => {
 	// создание элементов динамически:
 
 	// ! вместо вариантов ниже пишу через библиотеку axios
-	axios.get('http://localhost:3000/menu')
-		.then(data => {
-			data.data.forEach(({
-				img,
-				altimg,
-				title,
-				descr,
-				price
-			}) => { // используем дестуктуризацию - получаем значения ключей
-				new MenuCard(img, altimg, title, descr, price, '.menu .container').render(); // вызваем конструктор MenuCard(в конце 'куда вставляем в верстку').метод render()
-			});
-		});
-
-	// 1) вариант классами видимо
-	// getResource('http://localhost:3000/menu') // url берем из терминала
-	// 	.then(data => {	// данные приходящие с сервера, приходят как массив
-	// 		data.forEach(({img, altimg, title, descr, price}) => { // используем дестуктуризацию - получаем значения ключей
+	// axios.get('http://localhost:3000/menu')
+	// 	.then(data => {
+	// 		data.data.forEach(({
+	// 			img,
+	// 			altimg,
+	// 			title,
+	// 			descr,
+	// 			price
+	// 		}) => { // используем дестуктуризацию - получаем значения ключей
 	// 			new MenuCard(img, altimg, title, descr, price, '.menu .container').render(); // вызваем конструктор MenuCard(в конце 'куда вставляем в верстку').метод render()
 	// 		});
 	// 	});
+
+	// 1) вариант классами видимо
+	getResource('http://localhost:3000/menu') // url берем из терминала
+		.then(data => {	// данные приходящие с сервера, приходят как массив
+			data.forEach(({img, altimg, title, descr, price}) => { // используем дестуктуризацию - получаем значения ключей
+				new MenuCard(img, altimg, title, descr, price, '.menu .container').render(); // вызваем конструктор MenuCard(в конце 'куда вставляем в верстку').метод render()
+			});
+		});
 
 	// // 2) вариант отличие в том, что он не использует классы, а формирует верстку на лету
 	// // здесь нет шаблонизации, катит если надо только 1н раз что-то построить
@@ -628,6 +628,24 @@ window.addEventListener('DOMContentLoaded', () => {
 		dots.push(dot);
 	}
 
+	// функция изменения опасити у dots
+	function changeDotsOpacity() {
+		// ! у массива дотс изначально будет у каждого дот
+		dots.forEach(dot => dot.style.opacity = '.5');
+		// ! далее опасити меняем / идет поведение как выше у slides.length - 1
+		dots[slideIndex - 1].style.opacity = 1;
+	}
+
+	// функция изменения цифр у счетчика слайдера
+	function changeSlideIndex() {
+		// в зависимости от контроля слайдиндекс меняем значение где цифры
+		if (slides.length < 10) {
+			current.textContent = `0${slideIndex}`;
+		} else {
+			current.textContent = slideIndex;
+		}
+	}
+
 	next.addEventListener('click', () => {
 		// если ушли в правую границу (конец слайдера) то перемещаемся в начало
 		if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {
@@ -647,17 +665,10 @@ window.addEventListener('DOMContentLoaded', () => {
 			slideIndex++;
 		}
 
-		// в зависимости от контроля слайдиндекс меняем значение где цифры
-		if (slides.length < 10) {
-			current.textContent = `0${slideIndex}`;
-		} else {
-			current.textContent = slideIndex;
-		}
 
-		// ! у массива дотс изначально будет у каждого дот
-		dots.forEach(dot => dot.style.opacity = '.5');
-		// ! далее опасити меняем / идет поведение как выше у slides.length - 1
-		dots[slideIndex - 1].style.opacity = 1;
+
+		changeSlideIndex();
+		changeDotsOpacity();
 	});
 
 	prev.addEventListener('click', () => {
@@ -678,17 +689,8 @@ window.addEventListener('DOMContentLoaded', () => {
 			slideIndex--;
 		}
 
-		// в зависимости от контроля слайдиндекс меняем значение где цифры
-		if (slides.length < 10) {
-			current.textContent = `0${slideIndex}`;
-		} else {
-			current.textContent = slideIndex;
-		}
-
-		// ! у массива дотс изначально будет у каждого дот
-		dots.forEach(dot => dot.style.opacity = '.5');
-		// ! далее опасити меняем / идет поведение как выше у slides.length - 1
-		dots[slideIndex - 1].style.opacity = 1;
+		changeSlideIndex();
+		changeDotsOpacity();
 	});
 
 	// пишем переключение слайдов (с нумерацией) при кликах на dots реализовываем через  объект событие и атрибут
@@ -702,15 +704,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
 			slidesField.style.transform = `translateX(-${offset}px)`;
 
-			if (slides.length < 10) {
-				current.textContent = `0${slideIndex}`;
-			} else {
-				current.textContent = slideIndex;
-			}
-
-			dots.forEach(dot => dot.style.opacity = '.5');
-			dots[slideIndex - 1].style.opacity = 1;
-
+			changeSlideIndex();
+			changeDotsOpacity();
 		});
 	});
 
