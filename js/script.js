@@ -536,6 +536,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	// ! Slider
 
 	const slides = document.querySelectorAll('.offer__slide'),
+		slider = document.querySelector('.offer__slider'),
 		prev = document.querySelector('.offer__slider-prev'),
 		next = document.querySelector('.offer__slider-next'),
 		total = document.querySelector('#total'),
@@ -571,6 +572,62 @@ window.addEventListener('DOMContentLoaded', () => {
 		slide.style.width = width;
 	});
 
+	slider.style.position = 'relative';
+
+	// обвертка для всех точек (элем навигаци) и их стилизация
+	const indicators = document.createElement('ol'),
+		// ! созд массив, потом в него будем пушить наши дотсы; потом в условии перекл дотсы
+		dots = [];
+
+	indicators.classList.add('carousel-indicators');
+	indicators.style.cssText = `
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 15;
+		display: flex;
+		justify-content: center;
+		margin-right: 15%;
+		margin-left: 15%;
+		list-style: none;
+	`;
+	slider.append(indicators); // помещаем обвертку внутрь сладера
+
+	// создаем с помощью цикла несколько точек
+	for (let i = 0; i < slides.length; i++) {
+		const dot = document.createElement('li'); // создаем точки
+		// ! задаем атрибут,  i + 1 будет добавлять число к атрибуту начиная с 1
+		dot.setAttribute('data-slide-to', i + 1);
+
+		// стилизуем точки
+		dot.style.cssText = `
+			box-sizing: content-box;
+			flex: 0 1 auto;
+			width: 30px;
+			height: 6px;
+			margin-right: 3px;
+			margin-left: 3px;
+			cursor: pointer;
+			background-color: #fff;
+			background-clip: padding-box;
+			border-top: 10px solid transparent;
+			border-bottom: 10px solid transparent;
+			opacity: .5;
+			transition: opacity .6s ease;
+		`;
+
+		// когда i == 0 меняем опасити на 1
+		if (i == 0) {
+			dot.style.opacity = 1;
+		}
+
+		// вставляем точки внутрь indicators
+		indicators.append(dot);
+		// ! в массив dots пушим dot 
+		dots.push(dot);
+	}
+
 	next.addEventListener('click', () => {
 		// если ушли в правую границу (конец слайдера) то перемещаемся в начало
 		if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {
@@ -596,6 +653,11 @@ window.addEventListener('DOMContentLoaded', () => {
 		} else {
 			current.textContent = slideIndex;
 		}
+
+		// ! у массива дотс изначально будет у каждого дот
+		dots.forEach(dot => dot.style.opacity = '.5');
+		// ! далее опасити меняем / идет поведение как выше у slides.length - 1
+		dots[slideIndex - 1].style.opacity = 1;
 	});
 
 	prev.addEventListener('click', () => {
@@ -622,6 +684,34 @@ window.addEventListener('DOMContentLoaded', () => {
 		} else {
 			current.textContent = slideIndex;
 		}
+
+		// ! у массива дотс изначально будет у каждого дот
+		dots.forEach(dot => dot.style.opacity = '.5');
+		// ! далее опасити меняем / идет поведение как выше у slides.length - 1
+		dots[slideIndex - 1].style.opacity = 1;
+	});
+
+	// пишем переключение слайдов (с нумерацией) при кликах на dots реализовываем через  объект событие и атрибут
+	dots.forEach(dot => {
+		dot.addEventListener('click', (e) => {
+			const slideTo = e.target.getAttribute('data-slide-to');
+
+			// ! ниже все меняем при изменение slideTo (кликнули на 4 и цифрра сменилась на 4)
+			slideIndex = slideTo;
+			offset = +width.slice(0, width.length - 2) * (slideTo - 1);
+
+			slidesField.style.transform = `translateX(-${offset}px)`;
+
+			if (slides.length < 10) {
+				current.textContent = `0${slideIndex}`;
+			} else {
+				current.textContent = slideIndex;
+			}
+
+			dots.forEach(dot => dot.style.opacity = '.5');
+			dots[slideIndex - 1].style.opacity = 1;
+
+		});
 	});
 
 
