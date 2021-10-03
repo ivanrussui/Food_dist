@@ -646,6 +646,7 @@ window.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
+	// функция трансормирует строку в цисло и заменяет с помощью replace() удаляем все не числа из стркоки
 	function deleteNotDigits(str) {
 		return +str.replace(/\D/g, '');
 	}
