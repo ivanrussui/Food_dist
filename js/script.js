@@ -636,7 +636,7 @@ window.addEventListener('DOMContentLoaded', () => {
 		dots[slideIndex - 1].style.opacity = 1;
 	}
 
-	// функция изменения цифр у счетчика слайдера
+	// функция изменения цифр у счетчика слайдера 
 	function changeSlideIndex() {
 		// в зависимости от контроля слайдиндекс меняем значение где цифры
 		if (slides.length < 10) {
@@ -646,13 +646,17 @@ window.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
+	function deleteNotDigits(str) {
+		return +str.replace(/\D/g, '');
+	}
+
 	next.addEventListener('click', () => {
 		// если ушли в правую границу (конец слайдера) то перемещаемся в начало
-		if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {
+		if (offset == deleteNotDigits(width) * (slides.length - 1)) {
 			offset = 0;
 		} else {
 			// когда мы нажимаем на стрелку вправо,то к offset будет прибавляться ширина еще одного слайда и слайд будет смещаться
-			offset += +width.slice(0, width.length - 2);
+			offset += deleteNotDigits(width);
 		}
 
 		// сдвигаем слайд
@@ -665,8 +669,6 @@ window.addEventListener('DOMContentLoaded', () => {
 			slideIndex++;
 		}
 
-
-
 		changeSlideIndex();
 		changeDotsOpacity();
 	});
@@ -674,9 +676,9 @@ window.addEventListener('DOMContentLoaded', () => {
 	prev.addEventListener('click', () => {
 		if (offset == 0) { // тут сравниваем
 			// а тут присваиваем
-			offset = +width.slice(0, width.length - 2) * (slides.length - 1);
+			offset = deleteNotDigits(width) * (slides.length - 1);
 		} else {
-			offset -= +width.slice(0, width.length - 2);
+			offset -= deleteNotDigits(width);
 		}
 
 		// сдвигаем слайд
@@ -700,7 +702,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 			// ! ниже все меняем при изменение slideTo (кликнули на 4 и цифрра сменилась на 4)
 			slideIndex = slideTo;
-			offset = +width.slice(0, width.length - 2) * (slideTo - 1);
+			offset = deleteNotDigits(width) * (slideTo - 1);
 
 			slidesField.style.transform = `translateX(-${offset}px)`;
 
