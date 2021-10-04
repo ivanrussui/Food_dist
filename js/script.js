@@ -154,7 +154,7 @@ window.addEventListener('DOMContentLoaded', () => {
 		// стиль блокирующий прокрутку при откр модальн окна
 		document.body.style.overflow = 'hidden';
 		// если пользователь открыл сам модалку то clearInterval чтобы не появлялась модалка
-		clearInterval(modalTimerId);
+		clearInterval(modalTimerId); // ! специально временно коменчу чтобы не мешало
 	}
 
 	modalTrigger.forEach((btn) => {
@@ -201,6 +201,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	});
 
 	// модалка появляется спустя время на сайте
+	// ! ниже специально временно коменчу чтобы не мешало
 	const modalTimerId = setTimeout(openModal, 50000);
 
 	// функция появления модалки
@@ -217,6 +218,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	}
 
 	// модалка появляется когда юзер проскроллил сайт
+	// ! ниже специально временно коменчу чтобы не мешало
 	window.addEventListener('scroll', showModalByScroll);
 
 	// Использую классы для карточек
@@ -319,8 +321,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	// 1) вариант классами видимо
 	getResource('http://localhost:3000/menu') // url берем из терминала
-		.then(data => {	// данные приходящие с сервера, приходят как массив
-			data.forEach(({img, altimg, title, descr, price}) => { // используем дестуктуризацию - получаем значения ключей
+		.then(data => { // данные приходящие с сервера, приходят как массив
+			data.forEach(({
+				img,
+				altimg,
+				title,
+				descr,
+				price
+			}) => { // используем дестуктуризацию - получаем значения ключей
 				new MenuCard(img, altimg, title, descr, price, '.menu .container').render(); // вызваем конструктор MenuCard(в конце 'куда вставляем в верстку').метод render()
 			});
 		});
@@ -761,4 +769,88 @@ window.addEventListener('DOMContentLoaded', () => {
 	// next.addEventListener('click', () => {
 	// 	plusSlides(1); // плюс 1 слайд
 	// });
+
+	// ! Calculator
+
+	const result = document.querySelector('.calculating__result span'); // внутри класса span
+	// ? пол по умочанию выбрана женщина, рост, вес, возраст, значение активности с дата атрибутов по умолчанию с 1.375
+	let sex = 'female', 
+		height, weight, age, 
+		ratio = 1.375;
+
+	// функция расчета
+	function calcTotal() {
+		if (!sex || !height || !weight || !age || !ratio) {
+			result.textContent = '____';
+			return; // return сразу прекратит функцию если условие выше выполнится
+		}
+
+		if (sex === 'female') {
+			result.textContent = Math.round((447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age)) * ratio);
+		} else {
+			result.textContent = Math.round((88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age)) * ratio);
+		}
+	}
+
+	// * эту функ вызываем неск раз так как при любых изменениях должен идти пересчет
+	calcTotal();
+
+	// функция показывающая переключение, активные блоки и т.д.
+	function getStaticInformation(parentSelector, activeClass) {
+		// ? таким образом получает внутри parentSelector все divы
+		const elements = document.querySelectorAll(`${parentSelector} div`);
+
+		// ! перебираем, делигирование тут не прокатит будет между элементами при клике глюк
+		elements.forEach(elem => {
+			elem.addEventListener('click', (e) => {
+				// тут пишем чтобы куда мы кликнем оттуда активность/пол
+				if (e.target.getAttribute('data-ratio')) { // по дата атрибутам
+					ratio = +e.target.getAttribute('data-ratio');
+				} else {
+					sex = e.target.getAttribute('id'); // по полу
+				}
+	
+				// todo работаем с классами активности
+				elements.forEach(elem => {
+					elem.classList.remove(activeClass); // убираем класс активности кот передали в функцию
+				});
+	
+				e.target.classList.add(activeClass); // доб класс активности тому элементу на кот кликнули			
+	
+				// * эту функ вызываем неск раз так как при любых изменениях должен идти пересчет
+				calcTotal();
+			});
+		});
+	}
+
+	getStaticInformation('#gender', 'calculating__choose-item_active');
+	getStaticInformation('.calculating__choose_big', 'calculating__choose-item_active');
+
+
+	// функция собирающая  данные из инпутов
+	function getDynamicInformation(selector) {
+		const input = document.querySelector(selector);
+
+		input.addEventListener('input', () => {
+			// ? используем switch/case чтобы с разных инпутов ожно было подобрать данные
+			switch (input.getAttribute('id')) {
+				case 'height':
+					height = +input.value;
+					break;
+				case 'weight':
+					weight = +input.value;
+					break;
+				case 'age':
+					age = +input.value;
+					break;
+			}
+
+			// * эту функ вызываем неск раз так как при любых изменениях должен идти пересчет
+			calcTotal();
+		});
+	}
+
+	getDynamicInformation('#height');
+	getDynamicInformation('#weight');
+	getDynamicInformation('#age');
 });
