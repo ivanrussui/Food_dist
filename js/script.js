@@ -773,10 +773,42 @@ window.addEventListener('DOMContentLoaded', () => {
 	// ! Calculator
 
 	const result = document.querySelector('.calculating__result span'); // внутри класса span
-	// ? пол по умочанию выбрана женщина, рост, вес, возраст, значение активности с дата атрибутов по умолчанию с 1.375
-	let sex = 'female', 
-		height, weight, age, 
+
+	let sex, height, weight, age, ratio;
+
+	// ? если в localStorage есть инфа мы ее оттуда берем и помезщаем в переменные, а если инфы нет то задае ее по умолчанию
+	if (localStorage.getItem('sex')) {
+		sex = localStorage.getItem('sex');
+	}	else {
+		sex = 'female';
+		localStorage.setItem('sex', 'female');
+	}
+
+	if (localStorage.getItem('ratio')) {
+		ratio = localStorage.getItem('ratio');
+	}	else {
 		ratio = 1.375;
+		localStorage.setItem('ratio', 1.375);
+	}
+
+	// функция активности блоков. Инициализирует выбранные блоки
+	function initLocalSettings(selector, activeClass) {
+		const elements = document.querySelectorAll(selector);
+		// * логика такая при загрузке страницы проверяется ratio и sex на значения заданные в localStorage
+		elements.forEach(elem => {
+			elem.classList.remove(activeClass); // удаляем класс активности
+			if (elem.getAttribute('id') === localStorage.getItem('sex')) { // если элемент кот перебираем будет по значению атрибута id равен из локалстоража айтему sex
+				elem.classList.add(activeClass);  // то назначаем класс активности
+			}
+			if (elem.getAttribute('data-ratio') === localStorage.getItem('ratio')) { // аналогично только для значения атрибута data-ratio
+				elem.classList.add(activeClass);
+			}
+		});
+	}
+
+	// !               div так как мы обращаемся к блокам этих селекторов
+	initLocalSettings('#gender div', 'calculating__choose-item_active');
+	initLocalSettings('.calculating__choose_big div', 'calculating__choose-item_active');
 
 	// функция расчета
 	function calcTotal() {
@@ -796,9 +828,9 @@ window.addEventListener('DOMContentLoaded', () => {
 	calcTotal();
 
 	// функция показывающая переключение, активные блоки и т.д.
-	function getStaticInformation(parentSelector, activeClass) {
+	function getStaticInformation(selector, activeClass) {
 		// ? таким образом получает внутри parentSelector все divы
-		const elements = document.querySelectorAll(`${parentSelector} div`);
+		const elements = document.querySelectorAll(selector);
 
 		// ! перебираем, делигирование тут не прокатит будет между элементами при клике глюк
 		elements.forEach(elem => {
@@ -806,8 +838,12 @@ window.addEventListener('DOMContentLoaded', () => {
 				// тут пишем чтобы куда мы кликнем оттуда активность/пол
 				if (e.target.getAttribute('data-ratio')) { // по дата атрибутам
 					ratio = +e.target.getAttribute('data-ratio');
+					// * localStorage записываем по атрибуту
+					localStorage.setItem('ratio', +e.target.getAttribute('data-ratio'));
 				} else {
 					sex = e.target.getAttribute('id'); // по полу
+					localStorage.setItem('sex', e.target.getAttribute('id'));
+
 				}
 	
 				// todo работаем с классами активности
@@ -823,8 +859,9 @@ window.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	getStaticInformation('#gender', 'calculating__choose-item_active');
-	getStaticInformation('.calculating__choose_big', 'calculating__choose-item_active');
+	// !                  div так как мы обращаемся к блокам этих селекторов
+	getStaticInformation('#gender div', 'calculating__choose-item_active');
+	getStaticInformation('.calculating__choose_big div', 'calculating__choose-item_active');
 
 
 	// функция собирающая  данные из инпутов
@@ -832,7 +869,15 @@ window.addEventListener('DOMContentLoaded', () => {
 		const input = document.querySelector(selector);
 
 		input.addEventListener('input', () => {
-			// ? используем switch/case чтобы с разных инпутов ожно было подобрать данные
+
+			// ! если юзер вводит буквы
+			if (input.value.match(/\D/g)) {
+				input.style.border = '1px solid red';
+			} else {
+				input.style.border = 'none';
+			}
+			
+			// ? используем switch/case чтобы с разных инпутов можно было подобрать данные
 			switch (input.getAttribute('id')) {
 				case 'height':
 					height = +input.value;
