@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/ivanrussui/Food_dist#readme",
   "devDependencies": {
-    "json-server": "^0.16.3"
+    "json-server": "^0.16.3",
+    "webpack": "^5.58.2",
+    "webpack-cli": "^4.9.0"
   },
   "dependencies": {
     "gulp": "^4.0.2"
