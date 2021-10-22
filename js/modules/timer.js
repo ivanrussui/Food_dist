@@ -1,9 +1,5 @@
 // ? пишем функцию и внутрь перемещаем участок кода из файла script.js
-function timer() {
-	// ! Timer
-
-	// переменная определяющая дедлайн
-	const deadline = '2022-01-31';
+function timer(id, deadline) {
 
 	// функция определяющая разницу между дедлайном и текущим временем
 	function getTimeRemaining(endtime) {
@@ -72,8 +68,8 @@ function timer() {
 		}
 	}
 
-	setClock('.timer', deadline);
+	setClock(id, deadline);
 }
 
-// ! экспортируем используя CommonJS
-module.exports = timer;
+// ! экспортируем используя ES6
+export default timer;

@@ -1,9 +1,8 @@
 // ? пишем функцию tabs и внутрь перемещаем участок кода с tabs из файла script.js
-function tabs() {
-	// ! Tabs
-	const tabs = document.querySelectorAll('.tabheader__item'),
-		tabsContent = document.querySelectorAll('.tabcontent'),
-		tabsParent = document.querySelector('.tabheader__items');
+function tabs(tabsSelector, tabsContentSelector, tabsParentSelector, activeClass) {
+	const tabs = document.querySelectorAll(tabsSelector),
+		tabsContent = document.querySelectorAll(tabsContentSelector),
+		tabsParent = document.querySelector(tabsParentSelector);
 
 	// скрыть все ненужные табы
 	function hideTabContent() {
@@ -15,7 +14,7 @@ function tabs() {
 
 		// скрыв, надо убрать у всех табов класс активности
 		tabs.forEach((item) => {
-			item.classList.remove('tabheader__item_active');
+			item.classList.remove(activeClass);
 		});
 	}
 
@@ -24,7 +23,7 @@ function tabs() {
 		// надо понять к какому элементу обращаюсь
 		tabsContent[i].classList.add('show', 'fade');
 		tabsContent[i].classList.remove('hide');
-		tabs[i].classList.add('tabheader__item_active');
+		tabs[i].classList.add(activeClass);
 	}
 
 	hideTabContent();
@@ -36,7 +35,7 @@ function tabs() {
 		const target = event.target;
 		// проверяю на таргет (переменная выше) потом таргет.класслист,
 		// при помощи контэйнс определяю что точно кликнул в таб
-		if (target && target.classList.contains('tabheader__item')) {
+		if (target && target.classList.contains(tabsSelector.slice(1))) { // * tabsSelector.slice(1) пишем так потому что tabsSelector передается с точкой и slice формирует новую строку без 1 символа, то есть точки 
 			// перебераю псевдомассив, колбэк(айтем - это каждый таб кот перебираю и ай...
 			// ай отвечает за номер элемента по порядку)
 			tabs.forEach((item, i) => {
@@ -53,5 +52,5 @@ function tabs() {
 	});
 }
 
-// ! экспортируем используя CommonJS
-module.exports = tabs;
+// ! экспортируем используя ES6
+export default tabs;

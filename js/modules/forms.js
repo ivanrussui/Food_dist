@@ -1,10 +1,13 @@
+// ! импорты должны быть в самом верху
+import {closeModal, openModal} from './modal';
+import {postData} from '../services/services';
+
 // ? пишем функцию и внутрь перемещаем участок кода из файла script.js
-function forms() {
-	// ! Forms
+function forms(formSelector, modalTimerId) { // ! передаем аргументы которые принимают селекторы из файла scripts.js
 	// реализуем отправку данных форм, т.к. их 2 то делаем чер функ
 
 	// получаем формы
-	const forms = document.querySelectorAll('form');
+	const forms = document.querySelectorAll(formSelector);
 
 	// объект который будет вводть юзеру сообщение в зависимости от ситуации
 	const message = {
@@ -18,22 +21,6 @@ function forms() {
 		bindPostData(item);
 	});
 
-	// функция отвечающая за постинг данных
-	// async говорит что будет асинхронный код
-	// async await всегда используются в паре
-	const postData = async (url, data) => { // url кот передается в fetch, data данные которые будут поститься
-		// обрабатываем данные которые пришли
-		// await как бы (наподобие) делает синхронным, говорит надо дождаться
-		const res = await fetch(url, { // fetch(url чтобы ссылаться на сервер)
-			method: 'POST', // метод
-			headers: { // заголовки
-				'Content-type': 'application/json'
-			},
-			body: data // то тело которое мы будем отправлять
-		});
-		// возвращаем как json формат
-		return await res.json(); // res это промис
-	};
 
 	// функция отвечающая за привязку постинга
 	function bindPostData(form) {
@@ -104,7 +91,7 @@ function forms() {
 		// задача открыть класс модал и сформировать структуру внутри
 
 		// открываем модалку openModal() есть выше в коде когда писали модалку
-		openModal();
+		openModal('.modal', modalTimerId); // (селектор модальн окна кот будем закрывать, modalTimerId приходит из файла script.js)
 
 		// нужно создать блок обвертка
 		const thanksModal = document.createElement('div'); // создаем див
@@ -126,10 +113,10 @@ function forms() {
 			// показывать предидущий контент
 			prevModalDialog.classList.add('show'); // доб класс show
 			prevModalDialog.classList.remove('hide'); // убир класс hide
-			closeModal(); // закр мод окно
+			closeModal('.modal'); // закр мод окно (селектор модальн окна кот будем закрывать)
 		}, 2000);
 	}
 }
 
-// ! экспортируем используя CommonJS
-module.exports = forms;
+// ! экспортируем используя ES6
+export default forms;

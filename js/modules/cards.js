@@ -1,7 +1,7 @@
+import {getResource} from '../services/services';
+
 // ? пишем функцию cards и внутрь перемещаем участок кода с cards из файла script.js
 function cards() {
-	// ! Cards Использую классы для карточек
-
 	// получаю карточки
 	class MenuCard {
 		// путь к картинке, альт текст, заголовок, описание, цена, родитель куда помещаются карточки
@@ -66,22 +66,6 @@ function cards() {
 		}
 	}
 
-	// функция для получения данных с сервера
-	const getResource = async (url) => { // url кот передается в fetch, data нет т.к. ниче не отправляем
-		// обрабатываем данные которые пришли
-		// await как бы (наподобие) делает синхронным, говорит надо дождаться
-		const res = await fetch(url);
-
-		// fetch если столкнет с ошибкой http 404 и др. он не выдаст ошибку-catch-reject
-		// ошибкой для fetch будет отсутствие инета и др. поэтому надо такое поведение обработать
-		if (!res.ok) { // если в запросе что-то не так
-			throw new Error(`Cloud not fetch ${url}, status: ${res.status}`); // выбрасываем ошибку()
-		}
-
-		// возвращаем как json формат
-		return await res.json(); // res это промис
-	};
-
 	// создание элементов динамически:
 	// классами
 	getResource('http://localhost:3000/menu') // url берем из терминала
@@ -98,5 +82,5 @@ function cards() {
 		});
 }
 
-// ! экспортируем используя CommonJS
-module.exports = cards;
+// ! экспортируем используя ES6
+export default cards;

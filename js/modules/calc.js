@@ -1,7 +1,5 @@
 // ? пишем функцию и внутрь перемещаем участок кода из файла script.js
 function calc() {
-	// ! Calc Calculator
-
 	const result = document.querySelector('.calculating__result span'); // внутри класса span
 
 	let sex, height, weight, age, ratio;
@@ -130,5 +128,5 @@ function calc() {
 	getDynamicInformation('#age');
 }
 
-// ! экспортируем используя CommonJS
-module.exports = calc;
+// ! экспортируем используя ES6
+export default calc;
