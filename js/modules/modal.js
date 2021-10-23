@@ -68,12 +68,7 @@ function modal(triggerSelector, modalSelector, modalTimerId) { // ! переда
 	window.addEventListener('scroll', showModalByScroll);
 }
 
-
 // ! экспортируем используя ES6
 export default modal; // ? экспорт по умолчанию
-export {
-	closeModal
-}; // ? экспорт именнованый
-export {
-	openModal
-};
+export {closeModal}; // ? экспорт именнованый
+export {openModal};

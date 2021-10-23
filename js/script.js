@@ -29,5 +29,5 @@ window.addEventListener('DOMContentLoaded', () => {
 		wrapper: '.offer__slider-wrapper',
 		field: '.offer__slider-inner'
 	});
-
+	
 });
