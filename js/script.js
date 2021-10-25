@@ -1,3 +1,7 @@
+// todo используем полифил
+require('es6-promise/auto');
+import 'nodelist-foreach-polyfill';
+
 // ! импортируем файлы и функцию используя ES6
 import tabs from './modules/tabs';
 import modal from './modules/modal';
